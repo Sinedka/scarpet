@@ -1,51 +1,51 @@
-watch_pos = null;
-last_block = null;
+__config() -> {
+    'scope' -> 'global'
+};
 
-ll_check(x, y, z) ->
-(
-    watch_pos = [x, y, z];
-    last_block = block(watch_pos);
-    print('Watching ' + watch_pos);
+global('ll_targets', []);
+
+__command('ll_check', 'xyz', 'll_check') -> (
+    x = _,
+    y = _,
+    z = _;
+
+    global('ll_targets') = global('ll_targets') + [[x,y,z];
+
+    print('§aTracking portal at ' + x + ' ' + y + ' ' + z);
 );
 
-__on_tick() ->
-(
-    if(!watch_pos, exit());
+__on_tick() -> (
+    foreach(global('ll_targets'), pos,
+        x = pos:0;
+        y = pos:1;
+        z = pos:2;
 
-    current = block(watch_pos);
+        block = block(x,y,z);
 
-    if(
-        last_block != 'minecraft:nether_portal'
-        &&
-        current == 'minecraft:nether_portal',
+        // портал появился в этот тик
+        if(block == 'minecraft:nether_portal',
+            tnts = find_entities(
+                'minecraft:tnt',
+                x-64, y-64, z-64,
+                x+64, y+64, z+64
+            );
 
-        tnts = entity_area('tnt', watch_pos, 128);
+            if(length(tnts) > 0,
+                nearest = sort(tnts,
+                    distance(pos, entity_pos(_))
+                ):0;
 
-        if(length(tnts) > 0,
-            nearest = min(tnts, distance(query(_, 'pos'), watch_pos));
+                fuse = query(
+                    nearest,
+                    'Fuse'
+                );
 
-            fuse = query(nearest, 'nbt', 'Fuse');
-
-            print(format('Nearest TNT fuse: %d', fuse));
-        ,
-            print('No TNT found');
+                print(
+                    '§dPortal detected! TNT fuse: ' + fuse
+                );
+            ,
+                print('§cPortal detected, no TNT nearby');
+            );
         );
     );
-
-    last_block = current;
 );
-
-__config() -> {
-    'commands' -> {
-        'll_check <pos>' -> _(pos) -> (
-            watch_pos = pos;
-            last_block = block(pos);
-            print('Watching ' + pos);
-        )
-    },
-    'arguments' -> {
-        'pos' -> {
-            'type' -> 'pos'
-        }
-    }
-};
