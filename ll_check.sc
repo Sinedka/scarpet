@@ -34,3 +34,18 @@ __on_tick() ->
 
     last_block = current;
 );
+
+__config() -> {
+    'commands' -> {
+        'll_check <pos>' -> _(pos) -> (
+            watch_pos = pos;
+            last_block = block(pos);
+            print('Watching ' + pos);
+        )
+    },
+    'arguments' -> {
+        'pos' -> {
+            'type' -> 'pos'
+        }
+    }
+};
