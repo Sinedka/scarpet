@@ -22,6 +22,7 @@ __on_tick() ->
     if(!watch_pos, exit());
 
     current = block(watch_pos);
+    print(current)
 
     if(
         last_block != 'minecraft:nether_portal'
