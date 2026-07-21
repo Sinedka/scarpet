@@ -18,9 +18,9 @@ ll_check(pos) ->
 );
 
 distance(pos1, pos2) -> (
-    dx = pos2:0 - pos1:0;
-    dy = pos2:1 - pos1:1;
-    dz = pos2:2 - pos1:2;
+    dx = abs(pos2:0 - pos1:0);
+    dy = abs(pos2:1 - pos1:1);
+    dz = abs(pos2:2 - pos1:2);
 
     sqrt(dx^2 + dy^2 + dz^2)
 );
