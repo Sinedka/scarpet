@@ -1,5 +1,5 @@
-watch_pos = null;
-last_block = null;
+global_watch_pos = null;
+global_last_block = null;
 
 
 __config() -> {
@@ -12,35 +12,68 @@ __config() -> {
 
 ll_check(pos) ->
 (
-    watch_pos = pos;
-    last_block = block(watch_pos);
-    print('Watching ' + watch_pos);
+    global_watch_pos = pos;
+    global_last_block = block(pos);
+    print('Watching ' + pos);
+);
+
+distance(pos1, pos2) -> (
+    dx = pos2:0 - pos1:0;
+    dy = pos2:1 - pos1:1;
+    dz = pos2:2 - pos1:2;
+
+    sqrt(dx^2 + dy^2 + dz^2)
 );
 
 __on_tick() ->
 (
-    if(!watch_pos, exit());
 
-    current = block(watch_pos);
-    print(current);
-
-    if(
-        last_block != 'minecraft:nether_portal'
-        &&
-        current == 'minecraft:nether_portal',
-
-        tnts = entity_area('tnt', watch_pos, 128);
-
-        if(length(tnts) > 0,
-            nearest = min(tnts, distance(query(_, 'pos'), watch_pos));
-
-            fuse = query(nearest, 'nbt', 'Fuse');
-
-            print(format('Nearest TNT fuse: %d', fuse));
-        ,
-            print('No TNT found');
-        );
+    if(global_watch_pos == null,
+      (
+        exit();
+      )
     );
 
-    last_block = current;
+
+    
+    // global_last_block = block(pos);
+
+    near = entity_area('tnt', global_watch_pos:0,global_watch_pos:1,global_watch_pos:2, 3, 3, 3);
+    nearest = sort_key(
+      near,
+      distance(query(_, 'pos'), global_watch_pos)
+    ):0;
+    // if(nearest != null,
+    //   (
+    //     print(query(nearest, 'pos'));
+    //     print(query(nearest, 'nbt', 'fuse'));
+    //   ),
+    //   print('none')
+    // );
+    if(nearest != null,
+      fuse = query(nearest, 'nbt', 'fuse');
+      if(fuse == 1,
+          schedule(1, 'fun');
+          schedule(2, 'fun1');
+      )
+    )
+
 );
+
+fun() ->
+(
+  if(block(global_watch_pos)!='nether_portal',
+      print('not ok 1');
+  );
+  return(0);
+);
+
+fun1() ->
+(
+  if(block(global_watch_pos) !='air',
+    print(block(global_watch_pos));
+  );
+
+  return(0);
+);
+
