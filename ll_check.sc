@@ -27,7 +27,7 @@ distance(pos1, pos2) -> (
 
 __on_tick() ->
 (
-    print('hi')
+    print('hi');
 
     if(global_watch_pos == null,
       (
