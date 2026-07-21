@@ -39,7 +39,7 @@ __on_tick() ->
     
     // global_last_block = block(pos);
 
-    near = entity_area('tnt', global_watch_pos:0,global_watch_pos:1,global_watch_pos:2, 3, 3, 3);
+    near = entity_area('tnt', global_watch_pos:0,global_watch_pos:1,global_watch_pos:2, 16, 16, 16);
     nearest = sort_key(
       near,
       distance(query(_, 'pos'), global_watch_pos)
